@@ -1,0 +1,8 @@
+{
+  "files.associations": {
+    "iostream": "cpp",
+    "ios": "c",
+    "xiosbase": "c"
+  },
+  "C_Cpp.errorSquiggles": "Enabled"
+}
