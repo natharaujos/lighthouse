@@ -3,11 +3,11 @@
 #include <windows.h>
 #include "glut.h"
 #include <cmath>
-#define LINHAS_DA_IMAGEM 64
-#define COLUNAS_DA_IMAGEM 64
+#define LINHAS_DA_IMAGEM 60
+#define COLUNAS_DA_IMAGEM 60
 
-int anguloTotal, anguloTotalX, anguloSino, anguloBadalo, anguloMinutos, anguloHoras, eixoNormal, sinalNormal;
-bool sinoPositivo, iluminacaoLigada, texturaLigada, ativarAnimacao;
+int anguloTotal, anguloTotalX, eixoNormal, sinalNormal;
+bool iluminacaoLigada, texturaLigada, ativarAnimacao;
 GLubyte dadosDaImagem[LINHAS_DA_IMAGEM][COLUNAS_DA_IMAGEM][3];
 
 void geraImagemTextura()
@@ -25,45 +25,12 @@ void geraImagemTextura()
 	}
 }
 
-double ptsMeio[][2] = {
-	{0.1, 0},
-	{0.2, 0},
-	{0.1, 0.8},
-	{0.2, 0.7},
-	{0.1, 1},
-	{0.5, 1},
-	{0.1, 1.2},
-	{0.5, 1.2}};
-
-double ptsBaixo[][2] = {
-	{0, 0},
-	{0.2, 0},
-	{0, 0.8},
-	{0.2, 0.7},
-	{0, 1},
-	{0.5, 1},
-	{0, 3},
-	{0.2, 3},
-	{0.5, 3.3},
-	{0.5, 3}};
-
 GLfloat *calculaNorma()
 {
 	static GLfloat norma[] = {0, 0, 0};
 	norma[eixoNormal] = sinalNormal * 1;
 	return norma;
 }
-
-/* void mexePonteiroMinuto()
-{
-	anguloMinutos = (anguloMinutos - 5) % 360;
-}
-
-void mexePonteiroHora() 
-{
-	anguloHoras = (anguloHoras - 5) % 360;
-}
-*/
 
 void transladaSentidoHorario()
 {
@@ -80,7 +47,7 @@ void statusAnimacao()
 	ativarAnimacao = !ativarAnimacao;
 }
 
-void ilumina() //ATIVA E DESATIVA A ILUMINAÇÃO
+void ligaIluminacao() //ATIVA E DESATIVA A ILUMINAÇÃO
 {
 	GLfloat mat_specular[] = {1, 1, 1, 1};
 	GLfloat mat_shininess[] = {50};
@@ -91,20 +58,17 @@ void ilumina() //ATIVA E DESATIVA A ILUMINAÇÃO
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 	glEnable(GL_COLOR_MATERIAL);
 
-	if (iluminacaoLigada)
-	{
-		glDisable(GL_LIGHTING);
-		glDisable(GL_LIGHT0);
-		glDisable(GL_DEPTH_TEST);
-		iluminacaoLigada = false;
-	}
-
-	else
+	if (!iluminacaoLigada)
 	{
 		glEnable(GL_LIGHTING);
 		glEnable(GL_LIGHT0);
 		glEnable(GL_DEPTH_TEST);
-		iluminacaoLigada = true;
+	}
+	else if (iluminacaoLigada)
+	{
+		glDisable(GL_LIGHTING);
+		glDisable(GL_LIGHT0);
+		glDisable(GL_DEPTH_TEST);
 	}
 }
 
@@ -115,114 +79,12 @@ void textura()
 		glDisable(GL_TEXTURE_2D);
 		texturaLigada = false;
 	}
-	else
+	else if(!texturaLigada)
 	{
 		glEnable(GL_TEXTURE_2D);
 		texturaLigada = true;
 	}
 }
-
-void animacao(int null) //DEFINE O COMPORTAMENTO DOS PONTEIROS DE HORA E MINUTO E DO SINO COM O BADALO
-{
-	if (!ativarAnimacao)
-		return;
-
-	glutPostRedisplay();
-	anguloMinutos = (anguloMinutos - 1) % 360;
-
-	if (anguloMinutos % 72 == 0)
-	{
-		anguloHoras = ((anguloHoras - 6) % 360);
-	}
-
-	if (sinoPositivo)
-	{
-		if ((anguloSino + 1) % 360 < 8)
-		{
-			anguloSino = (anguloSino + 1) % 360;
-			anguloBadalo = (anguloBadalo - (1 + 2)) % 360;
-		}
-		else
-		{
-			sinoPositivo = !sinoPositivo;
-		}
-	}
-
-	else
-	{
-		if ((anguloSino - 1) % 360 > -8)
-		{
-			anguloSino = (anguloSino - 1) % 360;
-			anguloBadalo = (anguloBadalo + (1 + 2)) % 360;
-		}
-		else
-		{
-			sinoPositivo = !sinoPositivo;
-		}
-	}
-	glutTimerFunc(1000 / 60, animacao, NULL);
-}
-
-void quartoDeCirculo(double *extremaEsquerda, double *baixo, double *cima, int qtdPts) //DESENHA UM QUARTO DE UM CÍRCULO
-{
-	for (int i = 0; i <= qtdPts; i++)
-	{
-		double angulo = i * ((M_PI / 2) / qtdPts);
-		double raio = cima[0] - baixo[0];
-		double x = raio - (cos(angulo) * raio);
-		x += baixo[0];
-		double y = (sin(angulo) * raio);
-		y += baixo[1];
-		glVertex3f(x, y, 0);
-		glVertex3f(extremaEsquerda[0], extremaEsquerda[1], 0);
-	}
-	glVertex3f(cima[0], cima[1], 0);
-}
-
-/* void desenhaCirculoCompleto(double raio) //DESENHA UM CÍRCULO COMPLETO A PARTIR DE 4 QUARTOS DE CÍRCULO
-{
-	double ptsAux[][2] = {{raio, 0}, {0, 0}, {raio, raio}};
-
-	glPushMatrix();
-	sinalNormal = 1;
-	glBegin(GL_TRIANGLE_FAN);
-	glNormal3fv(calculaNorma());
-	quartoDeCirculo(ptsAux[0], ptsAux[1], ptsAux[2], 100);
-	glEnd();
-	glPopMatrix();
-
-	glPushMatrix();
-	glRotatef(180, 0, 1, 0);
-	glTranslatef(-0.5, 0, 0);
-	sinalNormal = -1;
-	glBegin(GL_TRIANGLE_FAN);
-	glNormal3fv(calculaNorma());
-	quartoDeCirculo(ptsAux[0], ptsAux[1], ptsAux[2], 100);
-	glEnd();
-	glPopMatrix();
-
-	glPushMatrix();
-	glRotatef(180, 1, 0, 0);
-	sinalNormal = -1;
-	glPushMatrix();
-	glBegin(GL_TRIANGLE_FAN);
-	glNormal3fv(calculaNorma());
-	quartoDeCirculo(ptsAux[0], ptsAux[1], ptsAux[2], 100);
-	glEnd();
-	glPopMatrix();
-
-	glPushMatrix();
-	glRotatef(180, 0, 1, 0);
-	glTranslatef(-0.5, 0, 0);
-	sinalNormal = 1;
-	glBegin(GL_TRIANGLE_FAN);
-	glNormal3fv(calculaNorma());
-	quartoDeCirculo(ptsAux[0], ptsAux[1], ptsAux[2], 100);
-	glEnd();
-	glPopMatrix();
-
-	glPopMatrix();
-} */
 
 void desenhaParteCima() //DESENHA O TELHADO
 {
@@ -243,80 +105,6 @@ void desenhaParteCima() //DESENHA O TELHADO
 	glPopMatrix();
 }
 
-/* void desenhaSino() //DESENHA O SINO
-{
-	glColor3f(1, 1, 0); //AMARELO
-
-	glPushMatrix();
-	glRotatef(anguloSino, 1, 0, 0);
-	glRotatef(270, 1, 0, 0);
-	glPushMatrix();
-	gluCylinder(gluNewQuadric(), 0.15, 0.1, 0.1, 32, 32);
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslatef(0, 0, 0.1);
-	gluCylinder(gluNewQuadric(), 0.1, 0.1, 0.2, 32, 32);
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslatef(0, 0, 0.3);
-	gluCylinder(gluNewQuadric(), 0.1, 0, 0.1, 32, 32);
-	glPopMatrix();
-
-	//DESENHA O BADALO
-	glPushMatrix();
-	glColor3f(0.6, 0.3, 0.1); //MARROM
-	glTranslatef(0, 0, 0.2);
-	glRotatef(anguloBadalo, 1, 0, 0);
-	glTranslatef(0.0, 0.0, -0.3);
-	gluCylinder(gluNewQuadric(), 0.05, 0.05, 0.3, 32, 32);
-	glutSolidSphere(0.06, 32, 32);
-	glPopMatrix();
-
-	glPopMatrix();
-} */
-/* 
-void desenhaRelogio() //DESENHA O RELÓGIO
-{
-	//CIRCULO DO RELOGIO
-	glPushMatrix();
-	desenhaCirculoCompleto(0.25);
-	glPushMatrix();
-	glTranslatef(0.25, 0, 0);
-	gluCylinder(gluNewQuadric(), 0.25, 0.25, 0.1, 32, 32);
-	glPopMatrix();
-
-	glTranslatef(0, 0, 0.1);
-	desenhaCirculoCompleto(0.25);
-	glTranslatef(0.25, 0, 0.01);
-
-	//PONTEIRO MINUTO
-	glPushMatrix();
-	glRotatef(anguloMinutos, 0, 0, 1);
-	glColor3f(1, 1, 1); //BRANCO
-	glBegin(GL_QUADS);
-	glVertex3f(0, 0, 0);
-	glVertex3f(0.03, 0.15, 0);
-	glVertex3f(0, 0.2, 0);
-	glVertex3f(-0.03, 0.15, 0);
-	glEnd();
-	glPopMatrix();
-
-	//PONTEIRO HORA
-	glPushMatrix();
-	glRotatef(anguloHoras, 0, 0, 1);
-	glBegin(GL_QUADS);
-	glVertex3f(0, 0, 0);
-	glVertex3f(0.03, 0.1, 0);
-	glVertex3f(0, 0.15, 0);
-	glVertex3f(-0.03, 0.1, 0);
-	glEnd();
-	glPopMatrix();
-
-	glPopMatrix();
-}
- */
 void desenhaFaceMeio() //DESENHA AS FACES DAS PILASTRAS DO MEIO QUE "SEGURAM" O TELHADO
 {
 	glPushMatrix();
@@ -411,11 +199,11 @@ void desenhaParteBaixo() //DESENHA O CORPO DA TORRE
 	glNormal3fv(calculaNorma());
 	glTexCoord2f(0.0f, 0.0f);
 	glVertex3f(0, 3, 0);
-	glTexCoord2f(1.0f, 0.0f);
+	//glTexCoord2f(1.0f, 0.0f);
 	glVertex3f(1, 3, 0);
 	glTexCoord2f(1.0f, 1.0f);
 	glVertex3f(1, -1, 0);
-	glTexCoord2f(0.0f, 1.0f);
+	//glTexCoord2f(0.0f, 1.0f);
 	glVertex3f(0, -1, 0);
 	sinalNormal = -1 * sinalNormal;
 	glEnd();
@@ -430,11 +218,11 @@ void desenhaParteBaixo() //DESENHA O CORPO DA TORRE
 	glNormal3fv(calculaNorma());
 	glTexCoord2f(0.0f, 0.0f);
 	glVertex3f(0, 3, 0);
-	glTexCoord2f(1.0f, 0.0f);
+	//glTexCoord2f(1.0f, 0.0f);
 	glVertex3f(1.0, 3, 0);
 	glTexCoord2f(1.0f, 1.0f);
 	glVertex3f(1, -1, 0);
-	glTexCoord2f(0.0f, 1.0f);
+	//glTexCoord2f(0.0f, 1.0f);
 	glVertex3f(0, -1, 0);
 	sinalNormal = -1 * sinalNormal;
 	glEnd();
@@ -447,11 +235,11 @@ void desenhaParteBaixo() //DESENHA O CORPO DA TORRE
 	glNormal3fv(calculaNorma());
 	glTexCoord2f(0.0f, 0.0f);
 	glVertex3f(0, 3, 0);
-	glTexCoord2f(1.0f, 0.0f);
+	//glTexCoord2f(1.0f, 0.0f);
 	glVertex3f(1.0, 3, 0);
 	glTexCoord2f(1.0f, 1.0f);
 	glVertex3f(1, -1, 0);
-	glTexCoord2f(0.0f, 1.0f);
+	//glTexCoord2f(0.0f, 1.0f);
 	glVertex3f(0, -1, 0);
 	sinalNormal = -1 * sinalNormal;
 	glEnd();
@@ -490,23 +278,11 @@ void desenhaTorre() //DESENHA A TORRE COMPLETA
 	glTranslatef(0.5, 2.2, -0.4);
 	glPopMatrix();
 
-	/* glPushMatrix();
-	glTranslatef(0.5, 3.6, -0.5);
-	//FUNÇÃO QUE DESENHA O SINO
-	desenhaSino();
-	glPopMatrix(); */
-
-	/* glPushMatrix();
-	glColor3f(0, 0, 1); //AZUL
-	glTranslatef(0.25, 3, 0.01);
-	//FUNÇÃO QUE DESENHA O RELÓGIO
-	desenhaRelogio();
-	glPopMatrix(); */
 }
 
 void init(void)
 {
-	glClearColor(0, 0, 0, 0);
+	glClearColor(1, 1, 1, 0);
 	geraImagemTextura();
 	//FUNÇÕES QUE ATRIBUEM OS PARÂMETROS DAS TEXTURAS
 	glTexImage2D(GL_TEXTURE_2D, 0, 3, COLUNAS_DA_IMAGEM, LINHAS_DA_IMAGEM, 0, GL_RGB,
@@ -518,13 +294,8 @@ void init(void)
 
 	//FUNÇÃO PARA HABILITAR A TEXTURA
 	glEnable(GL_TEXTURE_2D);
-
 	//FUNÇÃO PARA CORRIGIR A TEXTURA QUANDO OCORRE MUDANÇA DE PERSPECTIVA
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-
-	//INICIA POR PADRÃO COM A ILUMINAÇÃO E TEXTURA ATIVADAS
-	ilumina();
-	textura();
 }
 
 void display(void)
@@ -561,11 +332,6 @@ void opcoesTeclado(unsigned char key, int x, int y)
 	case 27:
 		exit(0);
 		break;
-	case 'a':
-		//ATIVA E DESATIVA A ANIMAÇÃO COMPLETA DO RELÓGIO E DO SINO
-		statusAnimacao();
-		animacao(NULL);
-		break;
 	case 'm':
 		//MOVE APENAS O PONTEIRO DE MINUTO
 		//mexePonteiroMinuto();
@@ -574,11 +340,22 @@ void opcoesTeclado(unsigned char key, int x, int y)
 		//MOVE APENAS O PONTEIRO DE HORA
 		//mexePonteiroHora();
 		break;
-	case 'i':
-		//ATIVA E DESATIVA A ILUMINAÇÃO
-		ilumina();
+	case 'l':
+		//ATIVA ILUMINAÇÃO
+		iluminacaoLigada = true;
+		ligaIluminacao();
 		break;
-	case 't':
+	case 'L':
+		//DESATIVA ILUMINAÇÃO
+		iluminacaoLigada = false;
+		ligaIluminacao();
+		break;
+	case 'p':
+		texturaLigada = false;
+		textura();
+		break;
+	case 'P':
+		texturaLigada = true;
 		textura();
 		break;
 	default:
