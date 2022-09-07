@@ -6,7 +6,7 @@
 #define LINHAS_DA_IMAGEM 60
 #define COLUNAS_DA_IMAGEM 60
 
-int anguloTotal, anguloTotalX, eixoNormal, sinalNormal;
+int anguloTotal, anguloTotalX, eixoNormal, sinalNormal,anguloCone=180;
 bool iluminacaoLigada, texturaLigada, ativarAnimacao;
 GLubyte dadosDaImagem[LINHAS_DA_IMAGEM][COLUNAS_DA_IMAGEM][3];
 
@@ -35,6 +35,10 @@ GLfloat *calculaNorma()
 void transladaSentidoHorario()
 {
 	anguloTotal = (anguloTotal + 10) % 360;
+}
+
+void rotacionaCone(){
+	anguloCone =  (anguloCone + 10) % 360;
 }
 
 void transladaVerticalmente()
@@ -260,6 +264,11 @@ void desenhaParteBaixo() //DESENHA O CORPO DA TORRE
 	glPopMatrix(); 
 }
 
+void desenhaCone(){
+	glColor3f(.33,.33,.33);
+	glutSolidCone(.25, .50, 25, 25);
+}
+
 void desenhaTorre() //DESENHA A TORRE COMPLETA
 {
 	//FUNÇÃO QUE DESENHA O CORPO DA TORRE
@@ -275,14 +284,23 @@ void desenhaTorre() //DESENHA A TORRE COMPLETA
 	glTranslatef(0, 3, 0);
 	//FUNÇÃO QUE DESENHA O TELHADO
 	desenhaParteCima();
-	glTranslatef(0.5, 2.2, -0.4);
+	//glTranslatef(0.5, 2.2, -0.4);
 	glPopMatrix();
+
+	glPushMatrix();
+	//FUNÇÃO QUE DESENHA O CONE
+	glTranslatef(0.5, 3.2, -0.4);
+	glRotatef(anguloCone,0,1,0);
+	desenhaCone();
+	glPopMatrix();
+
+
 
 }
 
 void init(void)
 {
-	glClearColor(1, 1, 1, 0);
+	glClearColor(0, 0, 0.35, 0);
 	geraImagemTextura();
 	//FUNÇÕES QUE ATRIBUEM OS PARÂMETROS DAS TEXTURAS
 	glTexImage2D(GL_TEXTURE_2D, 0, 3, COLUNAS_DA_IMAGEM, LINHAS_DA_IMAGEM, 0, GL_RGB,
@@ -332,9 +350,9 @@ void opcoesTeclado(unsigned char key, int x, int y)
 	case 27:
 		exit(0);
 		break;
-	case 'm':
-		//MOVE APENAS O PONTEIRO DE MINUTO
-		//mexePonteiroMinuto();
+	case 'g':
+		//MOVE cone
+		rotacionaCone();
 		break;
 	case 'h':
 		//MOVE APENAS O PONTEIRO DE HORA
