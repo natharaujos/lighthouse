@@ -6,8 +6,8 @@
 #define LINHAS_DA_IMAGEM 60
 #define COLUNAS_DA_IMAGEM 60
 
-int anguloTotal, anguloTotalX, eixoNormal, sinalNormal,anguloCone=180;
-bool iluminacaoLigada, texturaLigada, ativarAnimacao;
+int anguloTotal, anguloTotalX, eixoNormal, sinalNormal,anguloCone=180, velocidade = 8000;
+bool iluminacaoLigada, texturaLigada, ativarAnimacao, rotacaoAutomatica;
 GLubyte dadosDaImagem[LINHAS_DA_IMAGEM][COLUNAS_DA_IMAGEM][3];
 
 void geraImagemTextura()
@@ -36,9 +36,24 @@ void transladaSentidoHorario()
 {
 	anguloTotal = (anguloTotal + 10) % 360;
 }
+void animacao(int null)
+{
+    if (!ativarAnimacao)
+        return;
 
-void rotacionaCone(){
-	anguloCone =  (anguloCone + 10) % 360;
+    glutPostRedisplay();
+
+    anguloCone +=  (anguloCone + 10) % 360;
+    
+    glutTimerFunc(velocidade / 60, animacao, NULL);
+}
+void rotacionaCone(bool antihorario){
+	if(antihorario){
+		anguloCone =  (anguloCone - 10) % 360;
+	}
+	else {
+		anguloCone =  (anguloCone + 10) % 360;
+	}
 }
 
 void transladaVerticalmente()
@@ -267,7 +282,7 @@ void desenhaParteBaixo() //DESENHA O CORPO DA TORRE
 void desenhaCone(){
 	
 	glColor3f(.33,.33,.33);
-	glutSolidCone(.25, .50, 25, 25);
+	glutSolidCone(.25, .33, 25, 25);
 }
 
 void desenhaTorre() //DESENHA A TORRE COMPLETA
@@ -278,26 +293,25 @@ void desenhaTorre() //DESENHA A TORRE COMPLETA
 
 	glPushMatrix();
 	glDisable(GL_TEXTURE_2D);
-	glTranslatef(0, 3, 0);
+	glTranslatef(0, 2.7, 0);
 	//FUNÇÃO QUE DESENHA O PILARES QUE SEGURA O TELHADO
 	desenhaParteMeio();
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(0, 3, 0);
+	glTranslatef(0, 2.7, 0);
 	//FUNÇÃO QUE DESENHA O TELHADO
 	desenhaParteCima();
-	//glTranslatef(0.5, 2.2, -0.4);
+	glTranslatef(0.5, 2.2, -0.4);
 	glPopMatrix();
 
 	glPushMatrix();
 	//FUNÇÃO QUE DESENHA O CONE
-	glTranslatef(0.5, 3.2, -0.4);
+	glTranslatef(0.5, 3.5, -0.4);
 	glRotatef(anguloCone,0,1,0);
 	desenhaCone();
 	glEnable(GL_TEXTURE_2D);
 	glPopMatrix();
-	
 
 }
 
@@ -313,15 +327,11 @@ void init(void)
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-	GLfloat rgbaa[4] ;
-	rgbaa[0] = .9;
-	rgbaa[1] = .9;
-	rgbaa[2] = .9;
-	rgbaa[3] = 0;
+	GLfloat corTextura[4] = {.9,.9,.9,0};
 
 	glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_BLEND);
 
-	glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR , rgbaa);
+	glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR , corTextura);
 
 	//FUNÇÃO PARA HABILITAR A TEXTURA
 	glEnable(GL_TEXTURE_2D);
@@ -331,10 +341,9 @@ void init(void)
 }
 
 void display(void)
-{
+{	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
-	glColor3f(0, 0, 0); //CINZA CLARO
 
 	glPushMatrix();
 	glRotatef(anguloTotal, 0, 1, 0);
@@ -365,12 +374,12 @@ void opcoesTeclado(unsigned char key, int x, int y)
 		exit(0);
 		break;
 	case 'g':
-		//MOVE cone
-		rotacionaCone();
+		//MOVE cone horario
+		rotacionaCone(false);
 		break;
-	case 'h':
-		//MOVE APENAS O PONTEIRO DE HORA
-		//mexePonteiroHora();
+	case 'G':
+		//MOVE cone anti-horario
+		rotacionaCone(true);
 		break;
 	case 'l':
 		//ATIVA ILUMINAÇÃO
@@ -381,6 +390,13 @@ void opcoesTeclado(unsigned char key, int x, int y)
 		//DESATIVA ILUMINAÇÃO
 		iluminacaoLigada = false;
 		ligaIluminacao();
+		break;
+	case 'f':
+		statusAnimacao();
+        animacao(NULL);
+		break;
+	case 'F':
+		statusAnimacao();
 		break;
 	case 'p':
 		texturaLigada = false;
@@ -413,6 +429,25 @@ void opcoesMouse(int button, int state, int x, int y)
 	glutPostRedisplay();
 }
 
+void setas(int teclas, GLint x, GLint y)
+{
+    switch (teclas)
+    {
+    case GLUT_KEY_UP:
+        velocidade -=1000;
+        break;
+    case GLUT_KEY_DOWN:
+        velocidade +=1000;
+        break;
+    case GLUT_KEY_LEFT:
+        break;
+    case GLUT_KEY_RIGHT:
+        break;
+    }
+
+    glutPostRedisplay();
+}
+
 int main(int argc, char **argv)
 {
 	glutInit(&argc, argv);
@@ -425,6 +460,7 @@ int main(int argc, char **argv)
 	glutReshapeFunc(reshape);
 	glutKeyboardFunc(opcoesTeclado);
 	glutMouseFunc(opcoesMouse);
+	glutSpecialFunc(setas);
 	glutMainLoop();
 	return 0;
 }
