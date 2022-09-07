@@ -10,10 +10,10 @@ int anguloHorizontal, anguloVertical;
 int eixoDaNormal, sinalDaNormal;
 int anguloCone = 180; 
 int velocidade = 8000;
-bool LigaIluminacao, LigaTextura, LigaAnimacao;//, rotacaoAutomatica;
+bool LigaIluminacao, LigaTextura, LigaAnimacao;
 GLubyte dadosTextura[LINHAS_TEXTURA][COLUNAS_TEXTURA][3];
 
-void criaTextura(){ // FUNÇÃO PARA CARREGAR AS TEXTURAS
+void criaTextura(){ //Função para carregar as texturas
 	int valor;
 	for (int l = 0; l < LINHAS_TEXTURA; l++){
 		for (int c = 0; c < COLUNAS_TEXTURA; c++){
@@ -31,15 +31,15 @@ GLfloat *getNormal(){
 	return Normal;
 }
 
-void rodaHorario(){
+void rodaHorario(){ // Função para fazer a torre girar no sentido horario
 	anguloHorizontal = (anguloHorizontal +=10) % 360;
 }
 
-void rodaAntiHorario(){
+void rodaAntiHorario(){// Função para fazer a torre girar no sentido anti-horario
 	anguloHorizontal = (anguloHorizontal -= 10) % 360;
 }
 
-void realizaAnimacao(int NULO){
+void realizaAnimacao(int NULO){//Função que realiza que as animações 
 	if (!LigaAnimacao){
 		glutSwapBuffers();
 		return;
@@ -53,7 +53,7 @@ void realizaAnimacao(int NULO){
 
 }
 
-void rotacionaCone(bool antihorario){
+void rotacionaCone(bool antihorario){//Função que rotaciona o cone para ambos os sentidos
 
 	if (antihorario){
 
@@ -63,15 +63,15 @@ void rotacionaCone(bool antihorario){
 	}
 }
 
-void rodaVerticalmente(){
+void rodaVerticalmente(){//Função que rotaciona a torre verticalmente
 	anguloVertical = (anguloVertical + 10) % 360;
 }
 
-void ligaDesligaAnimacao(){
+void ligaDesligaAnimacao(){//Função que controla a variavel booleana que comanda a animação
 	LigaAnimacao = !LigaAnimacao;
 }
 
-void desenhaEstrelas(){
+void desenhaEstrelas(){//Função que desenha as estrelas
 
 	glColor3f(1,1,1);
 	glBegin(GL_POLYGON); 
@@ -160,7 +160,7 @@ void desenhaEstrelas(){
 	glEnd();
 }
 
-void ligaIluminacao() {// ATIVA E DESATIVA A ILUMINAÇÃO
+void ligaIluminacao() {// Função que liga e desliga a iluminação
 	GLfloat specular[] = {1, 1, 1, 1};
 	GLfloat shininess[] = {50};
 	GLfloat lightPosition[] = {1, 3, 1, 0};
@@ -181,7 +181,7 @@ void ligaIluminacao() {// ATIVA E DESATIVA A ILUMINAÇÃO
 	}
 }
 
-void ligaDesligaTextura(){
+void ligaDesligaTextura(){//Função que liga e desliga a textura
 	if (LigaTextura){
 		glDisable(GL_TEXTURE_2D);
 		LigaTextura = false;
@@ -191,7 +191,7 @@ void ligaDesligaTextura(){
 	}
 }
 
-void desenhaTelhado(){// DESENHA O TELHADO
+void desenhaTelhado(){// Função que desenha o telhado
 	glColor3f(1, 0, 0);
 	glRotatef(270, 1, 0, 0);
 	glutSolidCone(.8, 2, 25, 25);
@@ -201,7 +201,7 @@ void alteraNormal(){
 	sinalDaNormal = -1 * sinalDaNormal;
 }
 
-void desenhaPilastras() {// DESENHA AS FACES DAS PILASTRAS DO MEIO QUE "SEGURAM" O TELHADO
+void desenhaPilastras() {// Função que desenha as pilastras que seguram o telhado
 	glPushMatrix();
 	glBegin(GL_POLYGON);
 	glNormal3fv(getNormal());
@@ -229,7 +229,7 @@ void desenhaPilastras() {// DESENHA AS FACES DAS PILASTRAS DO MEIO QUE "SEGURAM"
 	alteraNormal();
 }
 
-void posicionaPilastras() {// FUNÇÃO QUE CHAMA O MÉTODO desenhaPilastras() PARA DESENHAR AS PILASTRAS EM SEUS RESPECTIVOS LUGARES
+void posicionaPilastras() {// Função que chama o metodo desenhaPilastras() para desenhar as pilastras no lugar certo
 	eixoDaNormal = 2;
 	sinalDaNormal = 1;
 
@@ -262,47 +262,42 @@ void posicionaPilastras() {// FUNÇÃO QUE CHAMA O MÉTODO desenhaPilastras() PA
 	glPopMatrix();
 }
 
-void desenhaCorpoTorre() // DESENHA O CORPO DA TORRE
+void desenhaCorpoTorre() // Função que desenha a torre
 {
 	eixoDaNormal = 2;
 	sinalDaNormal = 1;
 	glColor3f(1, 0, 0); // VERMELHO
 
-	// glTexCoord2f SAO AS COORDENADAS DAS TEXTURAS QUE SÃO DESIGNADAS AOS VÉRTICES QUE ESTÃO ABAIXO
-	//## DESENHA PARTE DA FRENTE
+	//Desenha parte da frente da torre
 	glPushMatrix();
 	glBegin(GL_QUADS);
 	glNormal3fv(getNormal());
 	glTexCoord2f(0.0f, 0.0f);
 	glVertex3f(0, 3, 0);
-	// glTexCoord2f(1.0f, 0.0f);
 	glVertex3f(1, 3, 0);
 	glTexCoord2f(1.0f, 1.0f);
 	glVertex3f(1, -1, 0);
-	// glTexCoord2f(0.0f, 1.0f);
 	glVertex3f(0, -1, 0);
 	alteraNormal();
 	glEnd();
 	glPopMatrix();
 
-	// DESENHA LADO ESQUERDO
+	// Desenha lado esquerdo da torre
 	glPushMatrix();
 	glRotatef(90, 0, 1, 0);
 	glBegin(GL_QUADS);
 	glNormal3fv(getNormal());
 	glTexCoord2f(0.0f, 0.0f);
 	glVertex3f(0, 3, 0);
-	// glTexCoord2f(1.0f, 0.0f);
 	glVertex3f(1, 3, 0);
 	glTexCoord2f(1.0f, 1.0f);
 	glVertex3f(1, -1, 0);
-	// glTexCoord2f(0.0f, 1.0f);
 	glVertex3f(0, -1, 0);
 	alteraNormal();
 	glEnd();
 	glPopMatrix();
 
-	// desenha lado direito
+	// Desenha lado direito da torre
 	glPushMatrix();
 	glRotatef(90, 0, 1, 0);
 	glTranslatef(0, 0, 1);
@@ -310,36 +305,32 @@ void desenhaCorpoTorre() // DESENHA O CORPO DA TORRE
 	glNormal3fv(getNormal());
 	glTexCoord2f(0.0f, 0.0f);
 	glVertex3f(0, 3, 0);
-	// glTexCoord2f(1.0f, 0.0f);
 	glVertex3f(1.0, 3, 0);
 	glTexCoord2f(1.0f, 1.0f);
 	glVertex3f(1, -1, 0);
-	// glTexCoord2f(0.0f, 1.0f);
 	glVertex3f(0, -1, 0);
 	alteraNormal();
 	glEnd();
 	glPopMatrix();
 
-	// desenha parte de tras
+	// Desenha parte de tras da torre
 	glPushMatrix();
 	glTranslatef(0, 0, -1);
 	glBegin(GL_QUADS);
 	glNormal3fv(getNormal());
 	glTexCoord2f(0.0f, 0.0f);
 	glVertex3f(0, 3, 0);
-	// glTexCoord2f(1.0f, 0.0f);
 	glVertex3f(1.0, 3, 0);
 	glTexCoord2f(1.0f, 1.0f);
 	glVertex3f(1, -1, 0);
-	// glTexCoord2f(0.0f, 1.0f);
 	glVertex3f(0, -1, 0);
 	alteraNormal();
 	glEnd();
 	glPopMatrix();
 
-	glColor3f(1, 1, 1); // VERMELHO
+	glColor3f(1, 1, 1); // Preto
 
-	// parte de cima (farol fica aqui em cima)
+	// parte de cima da torre (lugar onde fica o farol)
 	glPushMatrix();
 	glBegin(GL_QUADS);
 	glNormal3fv(getNormal());
@@ -352,32 +343,32 @@ void desenhaCorpoTorre() // DESENHA O CORPO DA TORRE
 	glPopMatrix();
 }
 
-void desenhaCone(){
+void desenhaCone(){//Função que desenha um cone
 	glColor3f(.33, .33, .33);
 	glutSolidCone(.25, .33, 25, 25);
 }
 
-void desenhaFarol() {// DESENHA A TORRE COMPLETA
+void desenhaFarol() {// Função que chama as outras funçoes de desenho do farol inteiro
 
-	// FUNÇÃO QUE DESENHA O CORPO DA TORRE
+	// Chamada da função que desenha o corpo da torre
 	desenhaCorpoTorre();
 
 	glPushMatrix();
 	glDisable(GL_TEXTURE_2D);
 	glTranslatef(0, 2.7, 0);
-	// FUNÇÃO QUE DESENHA O PILARES QUE SEGURA O TELHADO
+	// Chamada da função que desenha as pilastras 
 	posicionaPilastras();
 	glPopMatrix();
 
 	glPushMatrix();
 	glTranslatef(.5, 3.8, -.5);
-	// FUNÇÃO QUE DESENHA O TELHADO
+	// Chamada da função que desenha o telhado
 	desenhaTelhado();
 	glTranslatef(0.5, 2.2, -0.4);
 	glPopMatrix();
 
 	glPushMatrix();
-	// FUNÇÃO QUE DESENHA O CONE
+	// Chamada da função que desenha o cone
 	glTranslatef(0.5, 3.5, -0.4);
 	glRotatef(anguloCone, 0, 1, 0);
 	desenhaCone();
@@ -388,7 +379,6 @@ void desenhaFarol() {// DESENHA A TORRE COMPLETA
 void init(void){
 	glClearColor(0, 0, 0.35, 0);
 	criaTextura();
-	// FUNÇÕES QUE ATRIBUEM OS PARÂMETROS DAS TEXTURAS
 	glTexImage2D(GL_TEXTURE_2D, 0, 3, COLUNAS_TEXTURA, LINHAS_TEXTURA, 0, GL_RGB,
 				 GL_UNSIGNED_BYTE, dadosTextura);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -402,13 +392,11 @@ void init(void){
 
 	glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, corTextura);
 
-	// FUNÇÃO PARA HABILITAR A TEXTURA
 	glEnable(GL_TEXTURE_2D);
-	// FUNÇÃO PARA CORRIGIR A TEXTURA QUANDO OCORRE MUDANÇA DE PERSPECTIVA
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 }
 
-void display(void){
+void display(void){//Função de desenho
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 
@@ -423,7 +411,7 @@ void display(void){
 	glutSwapBuffers();
 }
 
-void reshape(int w, int h){
+void reshape(int w, int h){//Função que fica redesenhando
 	glViewport(0, 0, static_cast<GLsizei>(w), static_cast<GLsizei>(h));
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -433,41 +421,45 @@ void reshape(int w, int h){
 	glTranslatef(0, 0, -5);
 }
 
-void opcoesTeclado(unsigned char key, int x, int y){
+void opcoesTeclado(unsigned char key, int x, int y){//Função para configurar as teclas do teclado
 	switch (key){
 	case 27:
 		exit(0);
 		break;
-	case 'g'://
-		// MOVE cone horario
+	case 'g':
+		// Rotaciona cone sentido horario
 		rotacionaCone(false);
 		break;
-	case 'G'://
-		// MOVE cone anti-horario
+	case 'G':
+		// Rotaciona cone sentido anti-horario
 		rotacionaCone(true);
 		break;
-	case 'l'://
-		// ATIVA ILUMINAÇÃO
+	case 'l':
+		// Liga iluminação
 		LigaIluminacao = true;
 		ligaIluminacao();
 		break;
-	case 'L'://
-		// DESATIVA ILUMINAÇÃO
+	case 'L':
+		// Desliga iluminação
 		LigaIluminacao = false;
 		ligaIluminacao();
 		break;
-	case 'f'://
+	case 'f':
+		//Liga a animação
 		ligaDesligaAnimacao();
 		realizaAnimacao(NULL);
 		break;
-	case 'F'://
+	case 'F':
+		//Desliga a animação
 		ligaDesligaAnimacao();
 		break;
-	case 'p'://
+	case 'p':
+		//Liga a textura
 		LigaTextura = false;
 		ligaDesligaTextura();
 		break;
-	case 'P'://
+	case 'P':
+		//Desliga a textura
 		LigaTextura = true;
 		ligaDesligaTextura();
 		break;
@@ -478,21 +470,19 @@ void opcoesTeclado(unsigned char key, int x, int y){
 	glutPostRedisplay();
 }
 
-void opcoesMouse(int button, int state, int x, int y)
+void opcoesMouse(int button, int state, int x, int y)//Função que configura os botoes do mouse
 {
 	if (button == GLUT_LEFT_BUTTON){
-		// MUDA O ÂNGULO, DANDO A IMPRESSÃO DE TRANSLADAR NO SENTIDO HORÁRIO
 		rodaHorario();
 	}
 	else if (button == GLUT_RIGHT_BUTTON){
-		// MUDA O ÂNGULO, DANDO A IMPRESSÃO DE TRANSLADAR VERTICALMENTE
 		rodaVerticalmente();
 	}
 
 	glutPostRedisplay();
 }
 
-void setas(int teclas, GLint x, GLint y){
+void setas(int teclas, GLint x, GLint y){//Função que configura as setas do teclado
 	switch (teclas)
 	{
 	case GLUT_KEY_UP:
