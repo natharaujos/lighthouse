@@ -44,8 +44,10 @@ void transladaSentidoAntiHorario()
 
 void animacao(int null)
 {
-	if (!ativarAnimacao)
+	if (!ativarAnimacao){
+		glutSwapBuffers();
 		return;
+	}
 
 	glutPostRedisplay();
 
@@ -461,36 +463,36 @@ void opcoesTeclado(unsigned char key, int x, int y)
 	case 27:
 		exit(0);
 		break;
-	case 'g':
+	case 'g'://
 		// MOVE cone horario
 		rotacionaCone(false);
 		break;
-	case 'G':
+	case 'G'://
 		// MOVE cone anti-horario
 		rotacionaCone(true);
 		break;
-	case 'l':
+	case 'l'://
 		// ATIVA ILUMINAÇÃO
 		iluminacaoLigada = true;
 		ligaIluminacao();
 		break;
-	case 'L':
+	case 'L'://
 		// DESATIVA ILUMINAÇÃO
 		iluminacaoLigada = false;
 		ligaIluminacao();
 		break;
-	case 'f':
+	case 'f'://
 		statusAnimacao();
 		animacao(NULL);
 		break;
-	case 'F':
+	case 'F'://
 		statusAnimacao();
 		break;
-	case 'p':
+	case 'p'://
 		texturaLigada = false;
 		textura();
 		break;
-	case 'P':
+	case 'P'://
 		texturaLigada = true;
 		textura();
 		break;
