@@ -265,16 +265,19 @@ void desenhaParteBaixo() //DESENHA O CORPO DA TORRE
 }
 
 void desenhaCone(){
+	
 	glColor3f(.33,.33,.33);
 	glutSolidCone(.25, .50, 25, 25);
 }
 
 void desenhaTorre() //DESENHA A TORRE COMPLETA
 {
+	
 	//FUNÇÃO QUE DESENHA O CORPO DA TORRE
 	desenhaParteBaixo();
 
 	glPushMatrix();
+	glDisable(GL_TEXTURE_2D);
 	glTranslatef(0, 3, 0);
 	//FUNÇÃO QUE DESENHA O PILARES QUE SEGURA O TELHADO
 	desenhaParteMeio();
@@ -292,9 +295,9 @@ void desenhaTorre() //DESENHA A TORRE COMPLETA
 	glTranslatef(0.5, 3.2, -0.4);
 	glRotatef(anguloCone,0,1,0);
 	desenhaCone();
+	glEnable(GL_TEXTURE_2D);
 	glPopMatrix();
-
-
+	
 
 }
 
@@ -303,17 +306,28 @@ void init(void)
 	glClearColor(0, 0, 0.35, 0);
 	geraImagemTextura();
 	//FUNÇÕES QUE ATRIBUEM OS PARÂMETROS DAS TEXTURAS
-	glTexImage2D(GL_TEXTURE_2D, 0, 3, COLUNAS_DA_IMAGEM, LINHAS_DA_IMAGEM, 0, GL_RGB,
+	glTexImage2D(GL_TEXTURE_2D, 0, 3 , COLUNAS_DA_IMAGEM, LINHAS_DA_IMAGEM, 0, GL_RGB ,
 				 GL_UNSIGNED_BYTE, dadosDaImagem);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
+	GLfloat rgbaa[4] ;
+	rgbaa[0] = .9;
+	rgbaa[1] = .9;
+	rgbaa[2] = .9;
+	rgbaa[3] = 0;
+
+	glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_BLEND);
+
+	glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR , rgbaa);
+
 	//FUNÇÃO PARA HABILITAR A TEXTURA
 	glEnable(GL_TEXTURE_2D);
 	//FUNÇÃO PARA CORRIGIR A TEXTURA QUANDO OCORRE MUDANÇA DE PERSPECTIVA
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+	
 }
 
 void display(void)
