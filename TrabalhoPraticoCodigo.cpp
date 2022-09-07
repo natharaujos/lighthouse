@@ -66,11 +66,29 @@ void statusAnimacao()
 	ativarAnimacao = !ativarAnimacao;
 }
 
+void desenhaEstrela(){
+
+	glColor3f(1,1,1);
+	glBegin(GL_POLYGON); 
+	glVertex3f(0.2,0.6,0);
+	glVertex3f(0.4,0.8,0);
+	glVertex3f(0.6,0.6,0);
+	glVertex3f(0.4,0.4,0);
+	glEnd();
+	glBegin(GL_POLYGON); 
+	glVertex3f(-0.2,1,0);
+	glVertex3f(-0.3,1.1,0);
+	glVertex3f(-0.4,1,0);
+	glVertex3f(-0.3,0.9,0);
+	glEnd();
+
+}
+
 void ligaIluminacao() //ATIVA E DESATIVA A ILUMINAÇÃO
 {
 	GLfloat mat_specular[] = {1, 1, 1, 1};
 	GLfloat mat_shininess[] = {50};
-	GLfloat light_position[] = {1, 1, 1, 0};
+	GLfloat light_position[] = {1, 3, 1, 0};
 	glShadeModel(GL_SMOOTH);
 	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
 	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
@@ -351,6 +369,8 @@ void display(void)
 	glTranslatef(0, -2, 2);
 	desenhaTorre();
 	glPopMatrix();
+
+	desenhaEstrela();
 
 	glutSwapBuffers();
 }
