@@ -6,7 +6,7 @@
 #define LINHAS_DA_IMAGEM 60
 #define COLUNAS_DA_IMAGEM 60
 
-int anguloTotal, anguloTotalX, eixoNormal, sinalNormal,anguloCone=180, velocidade = 8000;
+int anguloTotal, anguloTotalX, eixoNormal, sinalNormal, anguloCone = 180, velocidade = 8000;
 bool iluminacaoLigada, texturaLigada, ativarAnimacao, rotacaoAutomatica;
 GLubyte dadosDaImagem[LINHAS_DA_IMAGEM][COLUNAS_DA_IMAGEM][3];
 
@@ -38,21 +38,25 @@ void transladaSentidoHorario()
 }
 void animacao(int null)
 {
-    if (!ativarAnimacao)
-        return;
+	if (!ativarAnimacao)
+		return;
 
-    glutPostRedisplay();
+	glutPostRedisplay();
 
-    anguloCone +=  (anguloCone + 10) % 360;
-    
-    glutTimerFunc(velocidade / 60, animacao, NULL);
+	anguloCone += (anguloCone + 10) % 360;
+
+	glutTimerFunc(velocidade / 60, animacao, NULL);
 }
-void rotacionaCone(bool antihorario){
-	if(antihorario){
-		anguloCone =  (anguloCone - 10) % 360;
+
+void rotacionaCone(bool antihorario)
+{
+	if (antihorario)
+	{
+		anguloCone = (anguloCone - 10) % 360;
 	}
-	else {
-		anguloCone =  (anguloCone + 10) % 360;
+	else
+	{
+		anguloCone = (anguloCone + 10) % 360;
 	}
 }
 
@@ -66,25 +70,25 @@ void statusAnimacao()
 	ativarAnimacao = !ativarAnimacao;
 }
 
-void desenhaEstrela(){
+void desenhaEstrela()
+{
 
-	glColor3f(1,1,1);
-	glBegin(GL_POLYGON); 
-	glVertex3f(0.2,0.6,0);
-	glVertex3f(0.4,0.8,0);
-	glVertex3f(0.6,0.6,0);
-	glVertex3f(0.4,0.4,0);
+	glColor3f(1, 1, 1);
+	glBegin(GL_POLYGON);
+	glVertex3f(0.2, 0.6, 0);
+	glVertex3f(0.4, 0.8, 0);
+	glVertex3f(0.6, 0.6, 0);
+	glVertex3f(0.4, 0.4, 0);
 	glEnd();
-	glBegin(GL_POLYGON); 
-	glVertex3f(-0.2,1,0);
-	glVertex3f(-0.3,1.1,0);
-	glVertex3f(-0.4,1,0);
-	glVertex3f(-0.3,0.9,0);
+	glBegin(GL_POLYGON);
+	glVertex3f(-0.2, 1, 0);
+	glVertex3f(-0.3, 1.1, 0);
+	glVertex3f(-0.4, 1, 0);
+	glVertex3f(-0.3, 0.9, 0);
 	glEnd();
-
 }
 
-void ligaIluminacao() //ATIVA E DESATIVA A ILUMINAÇÃO
+void ligaIluminacao() // ATIVA E DESATIVA A ILUMINAÇÃO
 {
 	GLfloat mat_specular[] = {1, 1, 1, 1};
 	GLfloat mat_shininess[] = {50};
@@ -116,33 +120,21 @@ void textura()
 		glDisable(GL_TEXTURE_2D);
 		texturaLigada = false;
 	}
-	else if(!texturaLigada)
+	else if (!texturaLigada)
 	{
 		glEnable(GL_TEXTURE_2D);
 		texturaLigada = true;
 	}
 }
 
-void desenhaParteCima() //DESENHA O TELHADO
+void desenhaParteCima() // DESENHA O TELHADO
 {
-	glPushMatrix();
-	glBegin(GL_TRIANGLE_FAN);
-	glColor3f(1, 0, 0); //VERMELHO
-	glVertex3f(0.5, 2.2, -0.4);
-	glNormal3f(0, 1 / M_SQRT2, 1 / M_SQRT2);
-	glVertex3f(0.1, 1.2, 0);
-	glVertex3f(0.1 + 0.8, 1.2, 0);
-	glNormal3f(1 / M_SQRT2, 1 / M_SQRT2, 0);
-	glVertex3f(0.1 + 0.8, 1.2, -1);
-	glNormal3f(0, -1 / M_SQRT2, -1 / M_SQRT2);
-	glVertex3f(0.1, 1.2, -1);
-	glNormal3f(-1 / M_SQRT2, -1 / M_SQRT2, 0);
-	glVertex3f(0.1, 1.2, 0);
-	glEnd();
-	glPopMatrix();
+	glColor3f(1, 0, 0);
+	glRotatef(270, 1, 0, 0);
+	glutSolidCone(.8, 2, 25, 25);
 }
 
-void desenhaFaceMeio() //DESENHA AS FACES DAS PILASTRAS DO MEIO QUE "SEGURAM" O TELHADO
+void desenhaFaceMeio() // DESENHA AS FACES DAS PILASTRAS DO MEIO QUE "SEGURAM" O TELHADO
 {
 	glPushMatrix();
 	glBegin(GL_POLYGON);
@@ -172,7 +164,7 @@ void desenhaFaceMeio() //DESENHA AS FACES DAS PILASTRAS DO MEIO QUE "SEGURAM" O 
 	sinalNormal = -1 * sinalNormal;
 }
 
-void desenhaParteMeio() //FUNÇÃO QUE CHAMA O MÉTODO desenhaFaceMeio() PARA DESENHAR AS PILASTRAS EM SEUS RESPECTIVOS LUGARES
+void desenhaParteMeio() // FUNÇÃO QUE CHAMA O MÉTODO desenhaFaceMeio() PARA DESENHAR AS PILASTRAS EM SEUS RESPECTIVOS LUGARES
 {
 	eixoNormal = 2;
 	sinalNormal = 1;
@@ -206,48 +198,47 @@ void desenhaParteMeio() //FUNÇÃO QUE CHAMA O MÉTODO desenhaFaceMeio() PARA DE
 	glPopMatrix();
 }
 
-void desenhaParteBaixo() //DESENHA O CORPO DA TORRE
+void desenhaParteBaixo() // DESENHA O CORPO DA TORRE
 {
 	eixoNormal = 2;
 	sinalNormal = 1;
-	glColor3f(1, 0, 0); //VERMELHO
+	glColor3f(1, 0, 0); // VERMELHO
 
-	//glTexCoord2f SAO AS COORDENADAS DAS TEXTURAS QUE SÃO DESIGNADAS AOS VÉRTICES QUE ESTÃO ABAIXO
+	// glTexCoord2f SAO AS COORDENADAS DAS TEXTURAS QUE SÃO DESIGNADAS AOS VÉRTICES QUE ESTÃO ABAIXO
 	//## DESENHA PARTE DA FRENTE
 	glPushMatrix();
 	glBegin(GL_QUADS);
 	glNormal3fv(calculaNorma());
 	glTexCoord2f(0.0f, 0.0f);
 	glVertex3f(0, 3, 0);
-	//glTexCoord2f(1.0f, 0.0f);
+	// glTexCoord2f(1.0f, 0.0f);
 	glVertex3f(1, 3, 0);
 	glTexCoord2f(1.0f, 1.0f);
 	glVertex3f(1, -1, 0);
-	//glTexCoord2f(0.0f, 1.0f);
+	// glTexCoord2f(0.0f, 1.0f);
 	glVertex3f(0, -1, 0);
 	sinalNormal = -1 * sinalNormal;
 	glEnd();
-	glPopMatrix(); 
+	glPopMatrix();
 
-	//DESENHA LADO ESQUERDO
+	// DESENHA LADO ESQUERDO
 	glPushMatrix();
 	glRotatef(90, 0, 1, 0);
 	glBegin(GL_QUADS);
 	glNormal3fv(calculaNorma());
 	glTexCoord2f(0.0f, 0.0f);
 	glVertex3f(0, 3, 0);
-	//glTexCoord2f(1.0f, 0.0f);
+	// glTexCoord2f(1.0f, 0.0f);
 	glVertex3f(1, 3, 0);
 	glTexCoord2f(1.0f, 1.0f);
 	glVertex3f(1, -1, 0);
-	//glTexCoord2f(0.0f, 1.0f);
+	// glTexCoord2f(0.0f, 1.0f);
 	glVertex3f(0, -1, 0);
 	sinalNormal = -1 * sinalNormal;
 	glEnd();
 	glPopMatrix();
 
-	
-	//desenha lado direito
+	// desenha lado direito
 	glPushMatrix();
 	glRotatef(90, 0, 1, 0);
 	glTranslatef(0, 0, 1);
@@ -255,36 +246,36 @@ void desenhaParteBaixo() //DESENHA O CORPO DA TORRE
 	glNormal3fv(calculaNorma());
 	glTexCoord2f(0.0f, 0.0f);
 	glVertex3f(0, 3, 0);
-	//glTexCoord2f(1.0f, 0.0f);
+	// glTexCoord2f(1.0f, 0.0f);
 	glVertex3f(1.0, 3, 0);
 	glTexCoord2f(1.0f, 1.0f);
 	glVertex3f(1, -1, 0);
-	//glTexCoord2f(0.0f, 1.0f);
-	glVertex3f(0, -1, 0);
-	sinalNormal = -1 * sinalNormal;
-	glEnd();
-	glPopMatrix();
-	
-	//desenha parte de tras
-	 glPushMatrix();
-	glTranslatef(0, 0, -1);
-	glBegin(GL_QUADS);
-	glNormal3fv(calculaNorma());
-	glTexCoord2f(0.0f, 0.0f);
-	glVertex3f(0, 3, 0);
-	//glTexCoord2f(1.0f, 0.0f);
-	glVertex3f(1.0, 3, 0);
-	glTexCoord2f(1.0f, 1.0f);
-	glVertex3f(1, -1, 0);
-	//glTexCoord2f(0.0f, 1.0f);
+	// glTexCoord2f(0.0f, 1.0f);
 	glVertex3f(0, -1, 0);
 	sinalNormal = -1 * sinalNormal;
 	glEnd();
 	glPopMatrix();
 
-	glColor3f(1, 1, 1); //VERMELHO
-	
-	//parte de cima (farol fica aqui em cima)
+	// desenha parte de tras
+	glPushMatrix();
+	glTranslatef(0, 0, -1);
+	glBegin(GL_QUADS);
+	glNormal3fv(calculaNorma());
+	glTexCoord2f(0.0f, 0.0f);
+	glVertex3f(0, 3, 0);
+	// glTexCoord2f(1.0f, 0.0f);
+	glVertex3f(1.0, 3, 0);
+	glTexCoord2f(1.0f, 1.0f);
+	glVertex3f(1, -1, 0);
+	// glTexCoord2f(0.0f, 1.0f);
+	glVertex3f(0, -1, 0);
+	sinalNormal = -1 * sinalNormal;
+	glEnd();
+	glPopMatrix();
+
+	glColor3f(1, 1, 1); // VERMELHO
+
+	// parte de cima (farol fica aqui em cima)
 	glPushMatrix();
 	glBegin(GL_QUADS);
 	glNormal3fv(calculaNorma());
@@ -294,72 +285,70 @@ void desenhaParteBaixo() //DESENHA O CORPO DA TORRE
 	glVertex3f(0, 3, -1);
 	sinalNormal = -1 * sinalNormal;
 	glEnd();
-	glPopMatrix(); 
+	glPopMatrix();
 }
 
-void desenhaCone(){
-	
-	glColor3f(.33,.33,.33);
+void desenhaCone()
+{
+	glColor3f(.33, .33, .33);
 	glutSolidCone(.25, .33, 25, 25);
 }
 
-void desenhaTorre() //DESENHA A TORRE COMPLETA
+void desenhaTorre() // DESENHA A TORRE COMPLETA
 {
-	
-	//FUNÇÃO QUE DESENHA O CORPO DA TORRE
+
+	// FUNÇÃO QUE DESENHA O CORPO DA TORRE
 	desenhaParteBaixo();
 
 	glPushMatrix();
 	glDisable(GL_TEXTURE_2D);
 	glTranslatef(0, 2.7, 0);
-	//FUNÇÃO QUE DESENHA O PILARES QUE SEGURA O TELHADO
+	// FUNÇÃO QUE DESENHA O PILARES QUE SEGURA O TELHADO
 	desenhaParteMeio();
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(0, 2.7, 0);
-	//FUNÇÃO QUE DESENHA O TELHADO
+	glTranslatef(.5, 3.8, -.5);
+	// FUNÇÃO QUE DESENHA O TELHADO
 	desenhaParteCima();
 	glTranslatef(0.5, 2.2, -0.4);
 	glPopMatrix();
 
 	glPushMatrix();
-	//FUNÇÃO QUE DESENHA O CONE
+	// FUNÇÃO QUE DESENHA O CONE
 	glTranslatef(0.5, 3.5, -0.4);
-	glRotatef(anguloCone,0,1,0);
+	glRotatef(anguloCone, 0, 1, 0);
 	desenhaCone();
 	glEnable(GL_TEXTURE_2D);
 	glPopMatrix();
-
 }
 
 void init(void)
 {
 	glClearColor(0, 0, 0.35, 0);
 	geraImagemTextura();
-	//FUNÇÕES QUE ATRIBUEM OS PARÂMETROS DAS TEXTURAS
-	glTexImage2D(GL_TEXTURE_2D, 0, 3 , COLUNAS_DA_IMAGEM, LINHAS_DA_IMAGEM, 0, GL_RGB ,
+	// FUNÇÕES QUE ATRIBUEM OS PARÂMETROS DAS TEXTURAS
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, COLUNAS_DA_IMAGEM, LINHAS_DA_IMAGEM, 0, GL_RGB,
 				 GL_UNSIGNED_BYTE, dadosDaImagem);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-	GLfloat corTextura[4] = {.9,.9,.9,0};
+	GLfloat corTextura[4] = {.9, .9, .9, 0};
 
-	glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_BLEND);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
 
-	glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR , corTextura);
+	glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, corTextura);
 
-	//FUNÇÃO PARA HABILITAR A TEXTURA
+	// FUNÇÃO PARA HABILITAR A TEXTURA
 	glEnable(GL_TEXTURE_2D);
-	//FUNÇÃO PARA CORRIGIR A TEXTURA QUANDO OCORRE MUDANÇA DE PERSPECTIVA
+	// FUNÇÃO PARA CORRIGIR A TEXTURA QUANDO OCORRE MUDANÇA DE PERSPECTIVA
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-	
 }
 
 void display(void)
-{	
+{
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 
@@ -394,26 +383,26 @@ void opcoesTeclado(unsigned char key, int x, int y)
 		exit(0);
 		break;
 	case 'g':
-		//MOVE cone horario
+		// MOVE cone horario
 		rotacionaCone(false);
 		break;
 	case 'G':
-		//MOVE cone anti-horario
+		// MOVE cone anti-horario
 		rotacionaCone(true);
 		break;
 	case 'l':
-		//ATIVA ILUMINAÇÃO
+		// ATIVA ILUMINAÇÃO
 		iluminacaoLigada = true;
 		ligaIluminacao();
 		break;
 	case 'L':
-		//DESATIVA ILUMINAÇÃO
+		// DESATIVA ILUMINAÇÃO
 		iluminacaoLigada = false;
 		ligaIluminacao();
 		break;
 	case 'f':
 		statusAnimacao();
-        animacao(NULL);
+		animacao(NULL);
 		break;
 	case 'F':
 		statusAnimacao();
@@ -437,12 +426,12 @@ void opcoesMouse(int button, int state, int x, int y)
 {
 	if (button == GLUT_LEFT_BUTTON)
 	{
-		//MUDA O ÂNGULO, DANDO A IMPRESSÃO DE TRANSLADAR NO SENTIDO HORÁRIO
+		// MUDA O ÂNGULO, DANDO A IMPRESSÃO DE TRANSLADAR NO SENTIDO HORÁRIO
 		transladaSentidoHorario();
 	}
 	else if (button == GLUT_RIGHT_BUTTON)
 	{
-		//MUDA O ÂNGULO, DANDO A IMPRESSÃO DE TRANSLADAR VERTICALMENTE
+		// MUDA O ÂNGULO, DANDO A IMPRESSÃO DE TRANSLADAR VERTICALMENTE
 		transladaVerticalmente();
 	}
 
@@ -451,21 +440,21 @@ void opcoesMouse(int button, int state, int x, int y)
 
 void setas(int teclas, GLint x, GLint y)
 {
-    switch (teclas)
-    {
-    case GLUT_KEY_UP:
-        velocidade -=1000;
-        break;
-    case GLUT_KEY_DOWN:
-        velocidade +=1000;
-        break;
-    case GLUT_KEY_LEFT:
-        break;
-    case GLUT_KEY_RIGHT:
-        break;
-    }
+	switch (teclas)
+	{
+	case GLUT_KEY_UP:
+		velocidade -= 1000;
+		break;
+	case GLUT_KEY_DOWN:
+		velocidade += 1000;
+		break;
+	case GLUT_KEY_LEFT:
+		break;
+	case GLUT_KEY_RIGHT:
+		break;
+	}
 
-    glutPostRedisplay();
+	glutPostRedisplay();
 }
 
 int main(int argc, char **argv)
