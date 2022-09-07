@@ -36,6 +36,12 @@ void transladaSentidoHorario()
 {
 	anguloTotal = (anguloTotal + 10) % 360;
 }
+
+void transladaSentidoAntiHorario()
+{
+	anguloTotal = (anguloTotal - 10) % 360;
+}
+
 void animacao(int null)
 {
 	if (!ativarAnimacao)
@@ -522,8 +528,10 @@ void setas(int teclas, GLint x, GLint y)
 		velocidade += 1000;
 		break;
 	case GLUT_KEY_LEFT:
+		transladaSentidoAntiHorario();
 		break;
 	case GLUT_KEY_RIGHT:
+		transladaSentidoHorario();
 		break;
 	}
 
