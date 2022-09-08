@@ -10,6 +10,11 @@ int anguloHorizontal, anguloVertical;
 int eixoDaNormal, sinalDaNormal;
 int anguloCone = 180; 
 int velocidade = 8000;
+float angle = 20;
+float globalAmb[] = {0.6f,0.6f,0.6f,1.0f};
+float globalDifusa[] = {1.0,1.0,1.0,1.0};
+float posicaoLuzDifusa[4] = {0.0,10.0,-10.0,1.0};
+float posicaoLuzAmbiente [4] = {0.0,0.0,0.0,0.0};
 bool LigaIluminacao, LigaTextura, LigaAnimacao;
 GLubyte dadosTextura[LINHAS_TEXTURA][COLUNAS_TEXTURA][3];
 
@@ -71,8 +76,15 @@ void ligaDesligaAnimacao(){//Função que controla a variavel booleana que coman
 	LigaAnimacao = !LigaAnimacao;
 }
 
+void desenhaSol(){
+	glTranslatef(5.8,4.2,0);
+	glRotatef(-90.0, 1.0, 0.0, 0.0);
+	glutWireSphere(1, 15, 15);
+}
+
 void desenhaEstrelas(){//Função que desenha as estrelas
 
+	glDisable(GL_TEXTURE_2D);
 	glColor3f(1,1,1);
 	glBegin(GL_POLYGON); 
 	glVertex3f(-5,4.6,0);
@@ -158,27 +170,7 @@ void desenhaEstrelas(){//Função que desenha as estrelas
 	glVertex3f(6.5,5,0);
 	glVertex3f(6.4,4.9,0);
 	glEnd();
-}
-
-void ligaIluminacao() {// Função que liga e desliga a iluminação
-	GLfloat specular[] = {1, 1, 1, 1};
-	GLfloat shininess[] = {50};
-	GLfloat lightPosition[] = {1, 3, 1, 0};
-	glShadeModel(GL_SMOOTH);
-	glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
-	glMaterialfv(GL_FRONT, GL_SHININESS, shininess);
-	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
-	glEnable(GL_COLOR_MATERIAL);
-
-	if (!LigaIluminacao){
-		glEnable(GL_LIGHTING);
-		glEnable(GL_LIGHT0);
-		glEnable(GL_DEPTH_TEST);
-	}else{
-		glDisable(GL_LIGHTING);
-		glDisable(GL_LIGHT0);
-		glDisable(GL_DEPTH_TEST);
-	}
+	glEnable(GL_TEXTURE_2D);
 }
 
 void ligaDesligaTextura(){//Função que liga e desliga a textura
@@ -378,6 +370,15 @@ void desenhaFarol() {// Função que chama as outras funçoes de desenho do faro
 
 void init(void){
 	glClearColor(0, 0, 0.35, 0);
+	glShadeModel(GL_SMOOTH);
+	glLightfv(GL_LIGHT0,GL_AMBIENT,globalAmb);
+	glLightfv(GL_LIGHT0,GL_POSITION,posicaoLuzAmbiente);
+	glLightfv(GL_LIGHT1,GL_DIFFUSE,globalDifusa);
+	glPushMatrix();
+	glTranslatef(1.5,2,0);
+	glRotatef(angle,0,1,0);
+	glLightfv(GL_LIGHT1,GL_POSITION,posicaoLuzDifusa);
+	glPopMatrix();
 	criaTextura();
 	glTexImage2D(GL_TEXTURE_2D, 0, 3, COLUNAS_TEXTURA, LINHAS_TEXTURA, 0, GL_RGB,
 				 GL_UNSIGNED_BYTE, dadosTextura);
@@ -393,6 +394,9 @@ void init(void){
 	glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, corTextura);
 
 	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_COLOR_MATERIAL);
+	glEnable(GL_DEPTH_TEST);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 }
 
@@ -406,8 +410,13 @@ void display(void){//Função de desenho
 	glTranslatef(0, -2, 2);
 	desenhaFarol();
 	glPopMatrix();
-
+	glPushMatrix();
 	desenhaEstrelas();
+	glPopMatrix();
+	glPushMatrix();
+	glColor3f(1.0, 1.0, 0.0);
+	desenhaSol();
+	glPopMatrix();
 	glutSwapBuffers();
 }
 
@@ -434,15 +443,19 @@ void opcoesTeclado(unsigned char key, int x, int y){//Função para configurar a
 		// Rotaciona cone sentido anti-horario
 		rotacionaCone(true);
 		break;
-	case 'l':
-		// Liga iluminação
-		LigaIluminacao = true;
-		ligaIluminacao();
+	 case 'l':
+	 	// Liga iluminação ambiente
+	 	glEnable(GL_LIGHT0);
 		break;
-	case 'L':
-		// Desliga iluminação
-		LigaIluminacao = false;
-		ligaIluminacao();
+	 case 'L':
+	 	// Desliga iluminação ambiente
+	 	glDisable(GL_LIGHT0);
+	 	break;
+	case 'j':
+		glEnable(GL_LIGHT1);
+		break;
+	case 'J':
+		glDisable(GL_LIGHT1);
 		break;
 	case 'f':
 		//Liga a animação
