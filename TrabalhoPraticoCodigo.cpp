@@ -10,7 +10,6 @@ int anguloHorizontal, anguloVertical;
 int eixoDaNormal, sinalDaNormal;
 int anguloCone = 180; 
 int velocidade = 8000;
-float angle = 20;
 float globalAmb[] = {0.6f,0.6f,0.6f,1.0f};
 float globalDifusa[] = {1.0,1.0,1.0,1.0};
 float posicaoLuzDifusa[4] = {0.0,10.0,-10.0,1.0};
@@ -371,14 +370,6 @@ void desenhaFarol() {// Função que chama as outras funçoes de desenho do faro
 void init(void){
 	glClearColor(0, 0, 0.35, 0);
 	glShadeModel(GL_SMOOTH);
-	glLightfv(GL_LIGHT0,GL_AMBIENT,globalAmb);
-	glLightfv(GL_LIGHT0,GL_POSITION,posicaoLuzAmbiente);
-	glLightfv(GL_LIGHT1,GL_DIFFUSE,globalDifusa);
-	glPushMatrix();
-	glTranslatef(1.5,2,0);
-	glRotatef(angle,0,1,0);
-	glLightfv(GL_LIGHT1,GL_POSITION,posicaoLuzDifusa);
-	glPopMatrix();
 	criaTextura();
 	glTexImage2D(GL_TEXTURE_2D, 0, 3, COLUNAS_TEXTURA, LINHAS_TEXTURA, 0, GL_RGB,
 				 GL_UNSIGNED_BYTE, dadosTextura);
@@ -394,15 +385,24 @@ void init(void){
 	glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, corTextura);
 
 	glEnable(GL_TEXTURE_2D);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_COLOR_MATERIAL);
-	glEnable(GL_DEPTH_TEST);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 }
 
 void display(void){//Função de desenho
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
+
+	glLightfv(GL_LIGHT0,GL_AMBIENT,globalAmb);
+	glLightfv(GL_LIGHT0,GL_POSITION,posicaoLuzAmbiente);
+	glLightfv(GL_LIGHT1,GL_DIFFUSE,globalDifusa);
+	glPushMatrix();
+	glTranslatef(1.5,2,0);
+	glRotatef(anguloCone,0,1,0);
+	glLightfv(GL_LIGHT1,GL_POSITION,posicaoLuzDifusa);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_COLOR_MATERIAL);
+	glEnable(GL_DEPTH_TEST);
+	glPopMatrix();
 
 	glPushMatrix();
 	glRotatef(anguloHorizontal, 0, 1, 0);
