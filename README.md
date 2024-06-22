@@ -17,3 +17,8 @@ To run the project, follow the steps below:
 2. **Execution:**
    - Compile and run the provided source code.
    - Observe the graphical model of the lighthouse rendered on the screen.
+
+## Contributors
+   - [Nathan Araújo](https://github.com/githubuser)
+   - [Breno Barbosa](https://github.com/githubuser)
+   - [Igor Freire](https://github.com/IgorFreiredeMorais)
